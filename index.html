@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkiFit AI — Умный подбор лыж и экипировки</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              400: '#38bdf8',
+              500: '#06b6d4',
+              600: '#0284c7',
+              accent: '#22d3ee',
+              glow: 'rgba(34, 211, 238, 0.15)'
+            }
+          },
+          boxShadow: {
+            'glow': '0 0 25px -5px rgba(6, 182, 212, 0.35)',
+            'card': '0 10px 30px -10px rgba(0, 0, 0, 0.5)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Кастомизация бегунков ползунков */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #22d3ee;
+      cursor: pointer;
+      box-shadow: 0 0 12px #06b6d4, 0 0 2px #fff;
+      border: 2px solid #0f172a;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 0 18px #22d3ee, 0 0 4px #fff;
+    }
+    input[type=range]::-moz-range-thumb {
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #22d3ee;
+      cursor: pointer;
+      box-shadow: 0 0 12px #06b6d4, 0 0 2px #fff;
+      border: 2px solid #0f172a;
+    }
+    /* Плавные переходы */
+    .transition-all-200 {
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-slate-950 flex flex-col justify-between relative overflow-x-hidden">
+
+  <!-- Фоновые неоновые световые пятна (Glow Orbs) -->
+  <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-cyan-500/10 via-sky-500/5 to-transparent blur-3xl pointer-events-none -z-10"></div>
+  <div class="fixed -bottom-24 -right-24 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+  <div class="fixed top-1/3 -left-32 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+  <!-- Главный контейнер -->
+  <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex-grow">
+
+    <!-- 1. ХЕДЕР -->
+    <header class="text-center mb-10 md:mb-12">
+      <div class="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-slate-900 border border-cyan-500/30 mb-4 shadow-sm">
+        <span class="flex h-2 w-2 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+        </span>
+        <span class="text-xs font-semibold uppercase tracking-wider text-cyan-400">MVP v1.0</span>
+        <span class="text-slate-600 text-xs">|</span>
+        <span class="text-xs text-slate-400">SkiSpec Engine</span>
+      </div>
+
+      <div class="flex items-center justify-center gap-3">
+        <!-- SVG Логотип: Стилизованные лыжные следы/горы -->
+        <div class="p-2.5 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-glow text-slate-950">
+          <svg class="w-7 h-7 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
+          </svg>
+        </div>
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white">
+          SkiFit <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">AI</span>
+        </h1>
+      </div>
+
+      <p class="mt-3 text-base md:text-lg text-slate-400 max-w-xl mx-auto font-normal">
+        Точный подбор ростовки и жесткости лыж за 5 секунд
+      </p>
+    </header>
+
+    <!-- ОСНОВНАЯ СЕТКА: Входные параметры & Результат -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+      
+      <!-- 2. БЛОК КАЛЬКУЛЯТОРА (ЛЕВАЯ КОЛОНКА) -->
+      <section class="lg:col-span-7 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-6 md:p-8 shadow-card">
+        <h2 class="text-xl font-bold text-white flex items-center gap-2 mb-6">
+          <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+          </svg>
+          Параметры райдера
+        </h2>
+
+        <!-- Выбор дисциплины (3 стильные кнопки-плашки) -->
+        <div class="mb-8">
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+            Стиль катания
+          </label>
+          <div class="grid grid-cols-3 gap-2.5 sm:gap-3" id="styleSelector">
+            <!-- Конек (Default) -->
+            <button type="button" data-style="skate" class="style-btn active relative p-3 sm:p-4 rounded-xl border text-center transition-all-200 flex flex-col items-center justify-center gap-1.5 focus:outline-none">
+              <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+              <span class="text-xs sm:text-sm font-semibold tracking-tight">Коньковый</span>
+            </button>
+
+            <!-- Классика -->
+            <button type="button" data-style="classic" class="style-btn relative p-3 sm:p-4 rounded-xl border text-center transition-all-200 flex flex-col items-center justify-center gap-1.5 focus:outline-none">
+              <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+              </svg>
+              <span class="text-xs sm:text-sm font-semibold tracking-tight">Классический</span>
+            </button>
+
+            <!-- Горные -->
+            <button type="button" data-style="alpine" class="style-btn relative p-3 sm:p-4 rounded-xl border text-center transition-all-200 flex flex-col items-center justify-center gap-1.5 focus:outline-none">
+              <svg class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21h18M5 21l7-14 4 8 2-4 3 10"/>
+              </svg>
+              <span class="text-xs sm:text-sm font-semibold tracking-tight">Горные лыжи</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Ползунок: Рост -->
+        <div class="mb-7">
+          <div class="flex justify-between items-baseline mb-2">
+            <span class="text-sm font-medium text-slate-300">Ваш рост</span>
+            <div class="flex items-baseline gap-1">
+              <span id="heightValue" class="text-2xl font-extrabold text-cyan-400 font-mono">175</span>
+              <span class="text-xs text-slate-400">см</span>
+            </div>
+          </div>
+          <div class="relative flex items-center">
+            <input type="range" id="heightInput" min="140" max="215" step="1" value="175" 
+                   class="w-full h-2.5 bg-slate-800 rounded-lg cursor-pointer">
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-500 mt-1.5 px-0.5 font-mono">
+            <span>140 см</span>
+            <span>175 см</span>
+            <span>215 см</span>
+          </div>
+        </div>
+
+        <!-- Ползунок: Вес -->
+        <div class="mb-4">
+          <div class="flex justify-between items-baseline mb-2">
+            <span class="text-sm font-medium text-slate-300">Ваш вес (в экипировке)</span>
+            <div class="flex items-baseline gap-1">
+              <span id="weightValue" class="text-2xl font-extrabold text-cyan-400 font-mono">70</span>
+              <span class="text-xs text-slate-400">кг</span>
+            </div>
+          </div>
+          <div class="relative flex items-center">
+            <input type="range" id="weightInput" min="40" max="130" step="1" value="70" 
+                   class="w-full h-2.5 bg-slate-800 rounded-lg cursor-pointer">
+          </div>
+          <div class="flex justify-between text-[11px] text-slate-500 mt-1.5 px-0.5 font-mono">
+            <span>40 кг</span>
+            <span>85 кг</span>
+            <span>130 кг</span>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-slate-800/80 flex items-center gap-2 text-xs text-slate-500">
+          <svg class="w-4 h-4 text-cyan-500/70 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Расчет учитывает рекомендации ISO и стандарты производителей Fischer, Salomon, Rossignol.
+        </div>
+      </section>
+
+      <!-- 3. БЛОК ДИНАМИЧЕСКИХ РЕЗУЛЬТАТОВ (ПРАВАЯ КОЛОНКА) -->
+      <section class="lg:col-span-5 flex flex-col gap-4">
+        <div class="bg-gradient-to-br from-slate-900 via-slate-900 to-slate-850 rounded-2xl border border-cyan-500/30 p-6 shadow-glow relative overflow-hidden">
+          
+          <div class="flex items-center justify-between mb-5">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Рекомендация калькулятора
+            </h3>
+            <span id="selectedStyleBadge" class="text-[11px] font-semibold px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800/60">
+              Конек
+            </span>
+          </div>
+
+          <!-- Результаты: Сетка метрик -->
+          <div class="space-y-4">
+            
+            <!-- Длина лыж -->
+            <div class="bg-slate-950/70 rounded-xl p-4 border border-slate-800/90 relative group hover:border-slate-700 transition-all-200">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                  🎿 Длина лыж
+                </span>
+                <span id="skiFormulaHint" class="text-[10px] text-slate-500 font-mono">Рост + 10...15 см</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="resSkiLength" class="text-3xl font-black text-white tracking-tight font-mono">185 - 190</span>
+                <span class="text-sm font-semibold text-slate-400">см</span>
+              </div>
+            </div>
+
+            <!-- Длина палок -->
+            <div class="bg-slate-950/70 rounded-xl p-4 border border-slate-800/90 relative group hover:border-slate-700 transition-all-200">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                  🦯 Ростовка палок
+                </span>
+                <span id="poleFormulaHint" class="text-[10px] text-slate-500 font-mono">Рост × 0.90</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span id="resPoleLength" class="text-3xl font-black text-cyan-300 tracking-tight font-mono">158</span>
+                <span class="text-sm font-semibold text-slate-400">см (округлено)</span>
+              </div>
+            </div>
+
+            <!-- Индекс жесткости -->
+            <div class="bg-slate-950/70 rounded-xl p-4 border border-slate-800/90 relative group hover:border-slate-700 transition-all-200">
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                  ⚖️ Жесткость колодки (Flex)
+                </span>
+                <span id="stiffnessWeightHint" class="text-[10px] text-slate-500 font-mono">70 кг</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <span id="stiffnessBadgeColor" class="w-3 h-3 rounded-full bg-cyan-400 shrink-0"></span>
+                <span id="resStiffness" class="text-lg md:text-xl font-bold text-white tracking-tight">Medium (Универсальная)</span>
+              </div>
+              <p id="stiffnessDesc" class="text-xs text-slate-400 mt-2">
+                Оптимальный баланс между сцеплением со снегом и эффективным прокатом.
+              </p>
+            </div>
+
+          </div>
+
+          <!-- Нижняя плашка подсказки -->
+          <div class="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
+            <span>Статус профиля: <strong class="text-emerald-400">Готов к заказу</strong></span>
+            <span class="font-mono text-cyan-400">ID: SF-70175</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 4. ФОРМА ЗАХВАТА ЗАЯВКИ ПОД РАСЧЕТОМ -->
+    <section class="mt-8 md:mt-12 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-900 rounded-2xl border border-cyan-500/20 p-6 md:p-8 shadow-card relative overflow-hidden">
+      <!-- Декоративная подсветка формы -->
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none"></div>
+
+      <div class="max-w-2xl mx-auto text-center">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-950/70 border border-cyan-500/30 text-cyan-300 text-xs font-semibold mb-3">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h8V3a1 1 0 112 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H3a2 2 0 01-2-2V6a2 2 0 012-2h1V3a1 1 0 011-1zm1 5h8v2H6V7z" clip-rule="evenodd"/>
+          </svg>
+          Эксклюзивный доступ к складу
+        </div>
+        
+        <h3 class="text-xl md:text-2xl font-bold text-white tracking-tight mb-2">
+          Получить персональную подборку 3 лучших моделей под ваши параметры со скидкой 15%
+        </h3>
+        <p class="text-sm text-slate-400 mb-6">
+          Отправим точные артикулы лыж в наличии, крепления и ростовки палок прямо в Telegram за 1 минуту.
+        </p>
+
+        <!-- Сама форма -->
+        <form id="leadForm" class="space-y-4 sm:space-y-0 sm:flex sm:gap-3 text-left max-w-xl mx-auto" novalidate>
+          <div class="flex-1">
+            <label for="userName" class="sr-only">Ваше имя</label>
+            <input type="text" id="userName" placeholder="Ваше имя" required
+                   class="w-full px-4 py-3 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm transition-all-200">
+          </div>
+          
+          <div class="flex-1">
+            <label for="userContact" class="sr-only">Telegram или Телефон</label>
+            <input type="text" id="userContact" placeholder="@username или +7..." required
+                   class="w-full px-4 py-3 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm transition-all-200">
+          </div>
+
+          <button type="submit" id="submitBtn"
+                  class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-glow hover:shadow-cyan-500/40 active:scale-[0.98] transition-all-200 shrink-0 flex items-center justify-center gap-2">
+            <span>Получить в Telegram</span>
+            <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+            </svg>
+          </button>
+        </form>
+
+        <p class="text-[11px] text-slate-500 mt-3">
+          Без спама. Отправляем только спецификацию и ссылку на закрытую распродажу экипировки.
+        </p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Футер -->
+  <footer class="w-full border-t border-slate-800/80 py-6 text-center text-xs text-slate-500 mt-8">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <span>© 2026 SkiFit AI. Интеллектуальный подбор спортивного инвентаря.</span>
+      <div class="flex items-center gap-4 text-slate-400">
+        <span class="hover:text-cyan-400 cursor-pointer">Политика приватности</span>
+        <span>•</span>
+        <span class="hover:text-cyan-400 cursor-pointer">Справочник ростовок</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- TOAST УВЕДОМЛЕНИЕ (Всплывающее окно) -->
+  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none max-w-sm w-full px-4">
+    <div class="bg-slate-900 border-2 border-cyan-400/80 rounded-2xl p-4 shadow-2xl backdrop-blur-xl flex items-start gap-3.5 text-white">
+      <div class="p-2 rounded-xl bg-cyan-500/20 text-cyan-400 shrink-0">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <h4 class="text-sm font-bold text-white mb-0.5">Заявка принята!</h4>
+        <p id="toastMessage" class="text-xs text-slate-300 leading-relaxed">
+          Параметры сохранены. Подборка отправлена в Telegram.
+        </p>
+      </div>
+      <button id="closeToast" class="text-slate-400 hover:text-white transition-colors" aria-label="Закрыть">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT ЛОГИКА -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // Состояние калькулятора
+      const state = {
+        height: 175,
+        weight: 70,
+        style: 'skate' // 'skate' | 'classic' | 'alpine'
+      };
+
+      // DOM элементы
+      const heightInput = document.getElementById('heightInput');
+      const weightInput = document.getElementById('weightInput');
+      const heightValue = document.getElementById('heightValue');
+      const weightValue = document.getElementById('weightValue');
+      const styleButtons = document.querySelectorAll('.style-btn');
+
+      // Элементы вывода результатов
+      const selectedStyleBadge = document.getElementById('selectedStyleBadge');
+      const resSkiLength = document.getElementById('resSkiLength');
+      const resPoleLength = document.getElementById('resPoleLength');
+      const resStiffness = document.getElementById('resStiffness');
+      const stiffnessBadgeColor = document.getElementById('stiffnessBadgeColor');
+      const stiffnessDesc = document.getElementById('stiffnessDesc');
+      const skiFormulaHint = document.getElementById('skiFormulaHint');
+      const poleFormulaHint = document.getElementById('poleFormulaHint');
+      const stiffnessWeightHint = document.getElementById('stiffnessWeightHint');
+
+      // Форма и Toast
+      const leadForm = document.getElementById('leadForm');
+      const userName = document.getElementById('userName');
+      const userContact = document.getElementById('userContact');
+      const toast = document.getElementById('toastNotification');
+      const toastMessage = document.getElementById('toastMessage');
+      const closeToast = document.getElementById('closeToast');
+
+      // Оформление активных кнопок стиля
+      function updateStyleButtonClasses() {
+        styleButtons.forEach(btn => {
+          const isSelected = btn.dataset.style === state.style;
+          if (isSelected) {
+            btn.className = 'style-btn active relative p-3 sm:p-4 rounded-xl border border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-glow text-center transition-all-200 flex flex-col items-center justify-center gap-1.5 focus:outline-none';
+          } else {
+            btn.className = 'style-btn relative p-3 sm:p-4 rounded-xl border border-slate-800 bg-slate-950 text-slate-400 hover:text-slate-200 hover:border-slate-700 text-center transition-all-200 flex flex-col items-center justify-center gap-1.5 focus:outline-none';
+          }
+        });
+      }
+
+      // Главная математическая функция пересчета
+      function recalculate() {
+        const h = parseInt(state.height, 10);
+        const w = parseInt(state.weight, 10);
+
+        // 1. Расчет длины лыж и палок в зависимости от стиля
+        let skiMin = 0;
+        let skiMax = 0;
+        let poleLen = 0;
+        let formulaSkiText = '';
+        let formulaPoleText = '';
+        let badgeName = '';
+
+        if (state.style === 'skate') {
+          // Конек: Рост + 10...15 см; Палки: Рост * 0.90
+          skiMin = h + 10;
+          skiMax = h + 15;
+          poleLen = Math.round(h * 0.90);
+          formulaSkiText = 'Рост + 10...15 см';
+          formulaPoleText = 'Рост × 0.90';
+          badgeName = 'Коньковый ход';
+        } else if (state.style === 'classic') {
+          // Классика: Рост + 20...25 см; Палки: Рост * 0.83
+          skiMin = h + 20;
+          skiMax = h + 25;
+          poleLen = Math.round(h * 0.83);
+          formulaSkiText = 'Рост + 20...25 см';
+          formulaPoleText = 'Рост × 0.83';
+          badgeName = 'Классический ход';
+        } else if (state.style === 'alpine') {
+          // Горные: Рост - 15...-5 см (или Рост - 5...15 см); Палки: Рост * 0.70
+          skiMin = h - 15;
+          skiMax = h - 5;
+          poleLen = Math.round(h * 0.70);
+          formulaSkiText = 'Рост - 15...-5 см';
+          formulaPoleText = 'Рост × 0.70';
+          badgeName = 'Горные лыжи';
+        }
+
+        // Обновление текстовых значений в UI
+        selectedStyleBadge.textContent = badgeName;
+        resSkiLength.textContent = `${skiMin} - ${skiMax}`;
+        resPoleLength.textContent = `${poleLen}`;
+        skiFormulaHint.textContent = formulaSkiText;
+        poleFormulaHint.textContent = formulaPoleText;
+        stiffnessWeightHint.textContent = `${w} кг`;
+
+        // 2. Расчет индекса жесткости по весу
+        // До 60 кг -> Soft (Мягкая)
+        // 61-85 кг -> Medium (Универсальная)
+        // Выше 85 кг -> Stiff / Hard (Жесткая)
+        if (w <= 60) {
+          resStiffness.textContent = 'Soft (Мягкая)';
+          stiffnessBadgeColor.className = 'w-3 h-3 rounded-full bg-emerald-400 shrink-0 shadow-sm';
+          stiffnessDesc.textContent = 'Обеспечивает легкий прогиб и надежное держание колодки даже при небольшом усилии райдера.';
+        } else if (w <= 85) {
+          resStiffness.textContent = 'Medium (Универсальная)';
+          stiffnessBadgeColor.className = 'w-3 h-3 rounded-full bg-cyan-400 shrink-0 shadow-sm';
+          stiffnessDesc.textContent = 'Оптимальный баланс между сцеплением со снегом и эффективным накатом на любых трассах.';
+        } else {
+          resStiffness.textContent = 'Stiff / Hard (Жесткая)';
+          stiffnessBadgeColor.className = 'w-3 h-3 rounded-full bg-purple-400 shrink-0 shadow-sm';
+          stiffnessDesc.textContent = 'Высокая торсионная жесткость и сопротивление прожатию колодки для мощного отталкивания без торможения.';
+        }
+      }
+
+      // Слушатели событий ползунков
+      heightInput.addEventListener('input', (e) => {
+        state.height = e.target.value;
+        heightValue.textContent = state.height;
+        recalculate();
+      });
+
+      weightInput.addEventListener('input', (e) => {
+        state.weight = e.target.value;
+        weightValue.textContent = state.weight;
+        recalculate();
+      });
+
+      // Слушатели выбора стиля
+      styleButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.style = btn.dataset.style;
+          updateStyleButtonClasses();
+          recalculate();
+        });
+      });
+
+      // Инициализация стиля кнопок при загрузке
+      updateStyleButtonClasses();
+      recalculate();
+
+      // Логика показа Toast
+      let toastTimeout;
+      function showToast(message) {
+        toastMessage.textContent = message;
+        toast.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
+        toast.classList.add('translate-y-0', 'opacity-100');
+
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => {
+          hideToast();
+        }, 5000);
+      }
+
+      function hideToast() {
+        toast.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }
+
+      closeToast.addEventListener('click', hideToast);
+
+      // Валидация и отправка формы
+      leadForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const nameVal = userName.value.trim();
+        const contactVal = userContact.value.trim();
+
+        // Простая клиентская валидация
+        if (!nameVal) {
+          userName.classList.add('border-rose-500');
+          userName.focus();
+          return;
+        } else {
+          userName.classList.remove('border-rose-500');
+        }
+
+        if (!contactVal) {
+          userContact.classList.add('border-rose-500');
+          userContact.focus();
+          return;
+        } else {
+          userContact.classList.remove('border-rose-500');
+        }
+
+        // Успешный сбор заявки
+        const successText = `Спасибо, ${nameVal}! Параметры сохранены (${state.height} см, ${state.weight} кг). Подборка отправлена в Telegram.`;
+        showToast(successText);
+
+        // Очистка формы
+        userName.value = '';
+        userContact.value = '';
+      });
+    });
+  </script>
+</body>
+</html>
