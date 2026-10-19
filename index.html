@@ -73,7 +73,7 @@
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-slate-950 flex flex-col justify-between relative overflow-x-hidden">
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-slate-950 flex flex-col justify-between relative overflow-x-hidden pb-24 md:pb-8">
 
   <!-- Фоновые неоновые световые пятна (Glow Orbs) -->
   <div class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-b from-cyan-500/10 via-sky-500/5 to-transparent blur-3xl pointer-events-none -z-10"></div>
@@ -84,7 +84,7 @@
   <div class="w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex-grow">
 
     <!-- 1. ХЕДЕР -->
-    <header class="text-center mb-10 md:mb-12">
+    <header class="text-center mb-8 md:mb-10">
       <div class="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-slate-900 border border-cyan-500/30 mb-4 shadow-sm">
         <span class="flex h-2 w-2 relative">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
@@ -96,13 +96,11 @@
       </div>
 
       <div class="flex items-center justify-center gap-3">
-        <!-- SVG Логотип: Стилизованные лыжные следы/горы -->
-        <div class="p-2.5 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-glow text-slate-950">
-          <svg class="w-7 h-7 text-slate-950" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m8 3 4 8 5-5 5 15H2L8 3z"/>
-          </svg>
+        <!-- Логотип IMG1.jpeg -->
+        <div class="p-0.5 rounded-2xl bg-gradient-to-br from-cyan-500 to-blue-600 shadow-glow overflow-hidden w-12 h-12 flex items-center justify-center shrink-0">
+          <img src="IMG1.jpeg" alt="SkiFit AI Logo" class="w-full h-full object-cover rounded-[14px]">
         </div>
-        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white">
+        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight text-white flex items-center gap-2">
           SkiFit <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-300 to-blue-500">AI</span>
         </h1>
       </div>
@@ -111,6 +109,11 @@
         Точный подбор ростовки и жесткости лыж за 5 секунд
       </p>
     </header>
+
+    <!-- Изображение баннера IMG2.jpg -->
+    <div class="w-full mb-8 md:mb-10 rounded-2xl overflow-hidden border border-slate-800 shadow-card">
+      <img src="IMG2.jpg" alt="Катание на лыжах в горах" class="w-full h-auto max-h-64 object-cover object-center bg-slate-900">
+    </div>
 
     <!-- ОСНОВНАЯ СЕТКА: Входные параметры & Результат -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -272,7 +275,7 @@
 
           <!-- Нижняя плашка подсказки -->
           <div class="mt-4 pt-3 border-t border-slate-800/60 flex items-center justify-between text-[11px] text-slate-400">
-            <span>Статус профиля: <strong class="text-emerald-400">Готов к заказу</strong></span>
+            <span>Статус профиля: <strong class="text-emerald-400">Готов к подбору</strong></span>
             <span class="font-mono text-cyan-400">ID: SF-70175</span>
           </div>
         </div>
@@ -280,8 +283,8 @@
 
     </div>
 
-    <!-- 4. ФОРМА ЗАХВАТА ЗАЯВКИ ПОД РАСЧЕТОМ -->
-    <section class="mt-8 md:mt-12 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-900 rounded-2xl border border-cyan-500/20 p-6 md:p-8 shadow-card relative overflow-hidden">
+    <!-- 4. НОВЫЙ БЛОК ЗАХВАТА С КНОПКОЙ В ТГ -->
+    <section class="mt-8 md:mt-12 bg-gradient-to-r from-slate-900 via-slate-905 to-slate-900 rounded-2xl border border-cyan-500/20 p-6 md:p-8 shadow-card relative overflow-hidden">
       <!-- Декоративная подсветка формы -->
       <div class="absolute -right-16 -top-16 w-64 h-64 bg-cyan-500/5 rounded-full blur-2xl pointer-events-none"></div>
 
@@ -300,31 +303,19 @@
           Отправим точные артикулы лыж в наличии, крепления и ростовки палок прямо в Telegram за 1 минуту.
         </p>
 
-        <!-- Сама форма -->
-        <form id="leadForm" class="space-y-4 sm:space-y-0 sm:flex sm:gap-3 text-left max-w-xl mx-auto" novalidate>
-          <div class="flex-1">
-            <label for="userName" class="sr-only">Ваше имя</label>
-            <input type="text" id="userName" placeholder="Ваше имя" required
-                   class="w-full px-4 py-3 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm transition-all-200">
-          </div>
-          
-          <div class="flex-1">
-            <label for="userContact" class="sr-only">Telegram или Телефон</label>
-            <input type="text" id="userContact" placeholder="@username или +7..." required
-                   class="w-full px-4 py-3 bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent text-sm transition-all-200">
-          </div>
-
-          <button type="submit" id="submitBtn"
-                  class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm shadow-glow hover:shadow-cyan-500/40 active:scale-[0.98] transition-all-200 shrink-0 flex items-center justify-center gap-2">
-            <span>Получить в Telegram</span>
-            <svg class="w-4 h-4 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+        <!-- Кнопка заявки, перенаправляющая на @mvpskifit_bot -->
+        <div class="max-w-sm mx-auto">
+          <a href="https://t.me/mvpskifit_bot" target="_blank" rel="noopener noreferrer" id="applyButton"
+             class="w-full inline-flex px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-extrabold text-base shadow-glow hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 items-center justify-center gap-3">
+            <svg class="w-5 h-5 text-slate-950" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.45-2.6 10.9-2.73 11.43-.07.27-.18.49-.39.6-.17.09-.38.08-.56-.03l-4.14-3.14-1.93 1.86c-.16.15-.36.23-.57.23-.11 0-.21-.02-.31-.07-.27-.12-.45-.39-.45-.69v-4.13c0-.18.05-.36.14-.52l6.23-7.51c.14-.17.38-.19.55-.05.15.13.17.35.05.52l-6.52 6.78 4.67 3.55 3.39-10.22c.11-.33.39-.55.73-.56.36 0 .66.21.76.54h.01z"/>
             </svg>
-          </button>
-        </form>
+            <span>Оставить заявку в Telegram</span>
+          </a>
+        </div>
 
         <p class="text-[11px] text-slate-500 mt-3">
-          Без спама. Отправляем только спецификацию и ссылку на закрытую распродажу экипировки.
+          Вы будете перенаправлены в нашего чат-бота @mvpskifit_bot для завершения подбора.
         </p>
       </div>
     </section>
@@ -343,25 +334,25 @@
     </div>
   </footer>
 
-  <!-- TOAST УВЕДОМЛЕНИЕ (Всплывающее окно) -->
-  <div id="toastNotification" class="fixed bottom-6 right-6 z-50 transform translate-y-32 opacity-0 transition-all duration-300 pointer-events-none max-w-sm w-full px-4">
-    <div class="bg-slate-900 border-2 border-cyan-400/80 rounded-2xl p-4 shadow-2xl backdrop-blur-xl flex items-start gap-3.5 text-white">
-      <div class="p-2 rounded-xl bg-cyan-500/20 text-cyan-400 shrink-0">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-      </div>
-      <div class="flex-1">
-        <h4 class="text-sm font-bold text-white mb-0.5">Заявка принята!</h4>
-        <p id="toastMessage" class="text-xs text-slate-300 leading-relaxed">
-          Параметры сохранены. Подборка отправлена в Telegram.
-        </p>
-      </div>
-      <button id="closeToast" class="text-slate-400 hover:text-white transition-colors" aria-label="Закрыть">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-        </svg>
-      </button>
+  <!-- ИНТЕГРИРОВАННЫЙ ЧАТ-БОТ В ПРАВОМ НИЖНЕМ УГЛУ -->
+  <div class="fixed bottom-4 right-4 z-50 flex flex-col items-end">
+    <!-- Кнопка открытия/закрытия виджета -->
+    <button id="toggleWidget" class="w-14 h-14 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold rounded-full shadow-2xl flex items-center justify-center active:scale-95 transition-all duration-300 relative group">
+      <!-- Иконка сообщения -->
+      <svg id="widgetIconOpen" class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+      </svg>
+      <!-- Иконка крестика (при открытии) -->
+      <svg id="widgetIconClose" class="w-6 h-6 text-slate-950 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+      <!-- Подсказка-тултип (при ховере) -->
+      <span class="absolute right-16 top-3 scale-0 transition-all rounded bg-slate-900 border border-slate-700 px-2.5 py-1 text-xs text-slate-200 group-hover:scale-100 whitespace-nowrap">Чат со SkiFit AI</span>
+    </button>
+    
+    <!-- Виджет iframe -->
+    <div id="chatWidgetContainer" class="hidden mt-3 w-[340px] h-[500px] sm:w-[400px] sm:h-[580px] bg-slate-900 rounded-2xl border border-cyan-500/30 overflow-hidden shadow-2xl transition-all duration-300">
+      <iframe allow="microphone;autoplay" style="width:100%;height:100%!important;border:none;" src="https://functions.pro-talk.ru/api/v1.0/chatgpt_widget_dialog_api?record_id=recCl7mF70HpcjseM&promt_id=74715&lang=ru&fullscreen=0&voice=1&prod=1&file=1"></iframe>
     </div>
   </div>
 
@@ -393,13 +384,26 @@
       const poleFormulaHint = document.getElementById('poleFormulaHint');
       const stiffnessWeightHint = document.getElementById('stiffnessWeightHint');
 
-      // Форма и Toast
-      const leadForm = document.getElementById('leadForm');
-      const userName = document.getElementById('userName');
-      const userContact = document.getElementById('userContact');
-      const toast = document.getElementById('toastNotification');
-      const toastMessage = document.getElementById('toastMessage');
-      const closeToast = document.getElementById('closeToast');
+      // Кнопка ТГ
+      const applyButton = document.getElementById('applyButton');
+
+      // Чат-виджет
+      const toggleWidget = document.getElementById('toggleWidget');
+      const chatWidgetContainer = document.getElementById('chatWidgetContainer');
+      const widgetIconOpen = document.getElementById('widgetIconOpen');
+      const widgetIconClose = document.getElementById('widgetIconClose');
+
+      // Логика виджета чат-бота
+      toggleWidget.addEventListener('click', () => {
+        const isHidden = chatWidgetContainer.classList.toggle('hidden');
+        if (isHidden) {
+          widgetIconClose.classList.add('hidden');
+          widgetIconOpen.classList.remove('hidden');
+        } else {
+          widgetIconOpen.classList.add('hidden');
+          widgetIconClose.classList.remove('hidden');
+        }
+      });
 
       // Оформление активных кнопок стиля
       function updateStyleButtonClasses() {
@@ -443,7 +447,7 @@
           formulaPoleText = 'Рост × 0.83';
           badgeName = 'Классический ход';
         } else if (state.style === 'alpine') {
-          // Горные: Рост - 15...-5 см (или Рост - 5...15 см); Палки: Рост * 0.70
+          // Горные: Рост - 15...-5 см; Палки: Рост * 0.70
           skiMin = h - 15;
           skiMax = h - 5;
           poleLen = Math.round(h * 0.70);
@@ -461,9 +465,6 @@
         stiffnessWeightHint.textContent = `${w} кг`;
 
         // 2. Расчет индекса жесткости по весу
-        // До 60 кг -> Soft (Мягкая)
-        // 61-85 кг -> Medium (Универсальная)
-        // Выше 85 кг -> Stiff / Hard (Жесткая)
         if (w <= 60) {
           resStiffness.textContent = 'Soft (Мягкая)';
           stiffnessBadgeColor.className = 'w-3 h-3 rounded-full bg-emerald-400 shrink-0 shadow-sm';
@@ -477,6 +478,12 @@
           stiffnessBadgeColor.className = 'w-3 h-3 rounded-full bg-purple-400 shrink-0 shadow-sm';
           stiffnessDesc.textContent = 'Высокая торсионная жесткость и сопротивление прожатию колодки для мощного отталкивания без торможения.';
         }
+
+        // 3. Динамическая подгрузка параметров в URL кнопки
+        const formattedMessage = encodeURIComponent(
+          `Привет! Мои параметры из калькулятора:\n🎿 Дисциплина: ${badgeName}\n🧍 Рост: ${h} см\n⚖️ Вес: ${w} кг\n\nРассчитанные характеристики:\n📏 Рекомендуемая длина лыж: ${skiMin}-${skiMax} см\n🦯 Ростовка палок: ${poleLen} см\n💪 Жесткость (Flex): ${resStiffness.textContent}`
+        );
+        applyButton.href = `https://t.me/mvpskifit_bot?start=${formattedMessage}`;
       }
 
       // Слушатели событий ползунков
@@ -504,59 +511,6 @@
       // Инициализация стиля кнопок при загрузке
       updateStyleButtonClasses();
       recalculate();
-
-      // Логика показа Toast
-      let toastTimeout;
-      function showToast(message) {
-        toastMessage.textContent = message;
-        toast.classList.remove('translate-y-32', 'opacity-0', 'pointer-events-none');
-        toast.classList.add('translate-y-0', 'opacity-100');
-
-        clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => {
-          hideToast();
-        }, 5000);
-      }
-
-      function hideToast() {
-        toast.classList.add('translate-y-32', 'opacity-0', 'pointer-events-none');
-        toast.classList.remove('translate-y-0', 'opacity-100');
-      }
-
-      closeToast.addEventListener('click', hideToast);
-
-      // Валидация и отправка формы
-      leadForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-
-        const nameVal = userName.value.trim();
-        const contactVal = userContact.value.trim();
-
-        // Простая клиентская валидация
-        if (!nameVal) {
-          userName.classList.add('border-rose-500');
-          userName.focus();
-          return;
-        } else {
-          userName.classList.remove('border-rose-500');
-        }
-
-        if (!contactVal) {
-          userContact.classList.add('border-rose-500');
-          userContact.focus();
-          return;
-        } else {
-          userContact.classList.remove('border-rose-500');
-        }
-
-        // Успешный сбор заявки
-        const successText = `Спасибо, ${nameVal}! Параметры сохранены (${state.height} см, ${state.weight} кг). Подборка отправлена в Telegram.`;
-        showToast(successText);
-
-        // Очистка формы
-        userName.value = '';
-        userContact.value = '';
-      });
     });
   </script>
 </body>
